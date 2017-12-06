@@ -62,6 +62,23 @@ var custBack = function () {
     });
 }
 
+var mgrBack = function () {
+    inquirer.prompt([
+        {
+            type: "confirm",
+            name: "backConf",
+            message: "\nback to the customer menu?"                
+        }
+    ]).then(function(answer){
+        if (answer.backConf) {
+            mgrFunct();
+        } else {
+            process.exit();
+        }
+
+    });
+}
+
 //customer functions
 //main customer menu
 
@@ -164,5 +181,50 @@ var orderProd =function() {
 
 var mgrFunct = function() {
     console.log("you are a MGR");
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "mgrMenu",
+            message: "What would you like to do?",
+            choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product", "Main Menu", "Exit"]
+            
+        }
+    ]).then(function(ans){
+
+    	if (ans.mgrMenu === "View Products for Sale"){
+    		viewAllMGR();
+    	} else if (ans.mgrMenu === "View Low Inventory"){
+    		viewLow();
+    	} else if (ans.mgrMenu === "Add to Inventory"){
+    		addInv();
+    	} else if (ans.mgrMenu === "Add New Product"){
+    		addNew();
+    	} else if (answer.mgrMenu === "Main Menu"){ //return to main
+            cli();
+        } else if (answer.mgrMenu === "Exit"){ //exit program
+            process.exit();
+        }
+    });
 }
 
+var viewAllMGR =function() {
+    console.log("\nYou are viewing our current inventory:");
+    var query = connection.query("SELECT * FROM products", function(err, res) {
+		if (err) throw err;
+		for (var i=0; i<res.length; i++) {
+			console.log("\nID #" + res[i].id + " | " + res[i].prodName + " | " + " Price: $" +res[i].price + " | " + "Quantity: " + res[i].qty);
+        }
+        mgrBack();
+	});
+};
+
+var viewLow =function() {
+    console.log("\nYou are viewing our current inventory:");
+    var query = connection.query("SELECT * FROM products", function(err, res) {
+		if (err) throw err;
+		for (var i=0; i<res.length; i++) {
+			console.log("\nID #" + res[i].id + " | " + res[i].prodName + " | " + " Price: $" +res[i].price + " | " + "Quantity: " + res[i].qty);
+        }
+        mgrBack();
+	});
+};
