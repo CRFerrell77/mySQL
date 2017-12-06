@@ -3,6 +3,9 @@
 var inquirer = require("inquirer");
 var mysql = require("mysql");
 
+//global Variables
+var QTY 
+
 //mySQL connect
 
 var connection = mysql.createConnection({
@@ -101,12 +104,12 @@ var orderProd =function() {
     ]).then(function(answer){
         console.log("chosen: "+answer.orderID);
 
-        var query = "SELECT prodName FROM products WHERE ?"; 
+        var query = "SELECT prodName,qty FROM products WHERE ?"; 
         connection.query(query, {id: answer.orderID}, function(err, res) {
             if (err) throw err;
             for (var i = 0; i < res.length; i++) {
                 var itemID = res[i].prodName;
-                //console.log("item: "+res[i].prodName);
+                var currQTY = res[i].qty;
             }
             inquirer.prompt([
                 {
@@ -116,11 +119,42 @@ var orderProd =function() {
                     
                 }
             ]).then(function(answer){
-                console.log("you would like to order: " + answer.orderQTY);
+                var inStockCheck = currQTY - answer.orderQTY;
+                QTY = answer.orderQTY;
+                console.log("your order would put us at: " + inStockCheck);
+                updateQty(inStockCheck);
             });                   
-        });
-    });
-}
+            var updateQty = function(value) {
+                if (value >= 0){
+                    var query = "UPDATE products set qty =" + value + " WHERE id =" + answer.orderID;
+                    connection.query(query, function(err, res,){
+                        if(err) throw err;
+                        giveAmt();
+                    })
+                } else {
+                    console.log("Insufficient QTY!\nPlease review on-hand amounts from the Customer Menu");
+                    custFunct();
+                }
+            }
+            var giveAmt = function() {
+                var query = "SELECT price FROM products WHERE id =" + answer.orderID;
+                connection.query(query, function(err, res,){
+                    if(err) throw err;
+                    for (var i = 0; i < res.length; i++) {
+                        var price = res[i].price;
+                        console.log("db price: " + price);
+                    }
+                    var QTYconverted = parseFloat(answer.orderQTY);
+                    console.log("qty: " +QTY);
+
+                    var total = price * QTY;
+                    console.log("That will be: $" + total);
+                });
+            };
+        }
+    )}
+)};
+
 // MGR functions
 
 var mgrFunct = function() {
