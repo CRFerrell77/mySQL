@@ -75,17 +75,55 @@ var viewAll =function() {
 		if (err) throw err;
 		for (var i=0; i<res.length; i++) {
 			console.log("\nID #" + res[i].id + " | " + res[i].prodName + " | " + " Price: $" +res[i].price + " | " + "Quantity: " + res[i].qty);
-		}
+        }
+        inquirer.prompt([
+            {
+                type: "confirm",
+                name: "backConf",
+                message: "\nback to the customer menu?"                
+            }
+        ]).then(function(answer){
+            custFunct();
+    
+        });
 	});
 };
 
 var orderProd =function() {
-    console.log("you are ordering");
-};
+    console.log("\nOrdering Menu:");
+    inquirer.prompt([
+        {
+            type: "text",
+            name: "orderID",
+            message: "\nWhat ID # you like to order?"
+            
+        }
+    ]).then(function(answer){
+        console.log("chosen: "+answer.orderID);
 
+        var query = "SELECT prodName FROM products WHERE ?"; 
+        connection.query(query, {id: answer.orderID}, function(err, res) {
+            if (err) throw err;
+            for (var i = 0; i < res.length; i++) {
+                var itemID = res[i].prodName;
+                //console.log("item: "+res[i].prodName);
+            }
+            inquirer.prompt([
+                {
+                    type: "text",
+                    name: "orderQTY",
+                    message: "\nHow many ( " + itemID + " ) would you like to order?"
+                    
+                }
+            ]).then(function(answer){
+                console.log("you would like to order: " + answer.orderQTY);
+            });                   
+        });
+    });
+}
 // MGR functions
 
 var mgrFunct = function() {
     console.log("you are a MGR");
-
 }
+
