@@ -45,6 +45,22 @@ var cli = function() {
 
 cli();
 
+var custBack = function () {
+    inquirer.prompt([
+        {
+            type: "confirm",
+            name: "backConf",
+            message: "\nback to the customer menu?"                
+        }
+    ]).then(function(answer){
+        if (answer.backConf) {
+            custFunct();
+        } else {
+            process.exit();
+        }
+
+    });
+}
 
 //customer functions
 //main customer menu
@@ -79,16 +95,7 @@ var viewAll =function() {
 		for (var i=0; i<res.length; i++) {
 			console.log("\nID #" + res[i].id + " | " + res[i].prodName + " | " + " Price: $" +res[i].price + " | " + "Quantity: " + res[i].qty);
         }
-        inquirer.prompt([
-            {
-                type: "confirm",
-                name: "backConf",
-                message: "\nback to the customer menu?"                
-            }
-        ]).then(function(answer){
-            custFunct();
-    
-        });
+        custBack();
 	});
 };
 
@@ -102,7 +109,7 @@ var orderProd =function() {
             
         }
     ]).then(function(answer){
-        console.log("chosen: "+answer.orderID);
+        //console.log("chosen: "+answer.orderID);
 
         var query = "SELECT prodName,qty FROM products WHERE ?"; 
         connection.query(query, {id: answer.orderID}, function(err, res) {
@@ -121,7 +128,7 @@ var orderProd =function() {
             ]).then(function(answer){
                 var inStockCheck = currQTY - answer.orderQTY;
                 QTY = answer.orderQTY;
-                console.log("your order would put us at: " + inStockCheck);
+                //console.log("your order would put us at: " + inStockCheck);
                 updateQty(inStockCheck);
             });                   
             var updateQty = function(value) {
@@ -142,13 +149,11 @@ var orderProd =function() {
                     if(err) throw err;
                     for (var i = 0; i < res.length; i++) {
                         var price = res[i].price;
-                        console.log("db price: " + price);
+                        console.log("Price: " + price + ", QTY: " + QTY);
                     }
-                    var QTYconverted = parseFloat(answer.orderQTY);
-                    console.log("qty: " +QTY);
-
                     var total = price * QTY;
                     console.log("That will be: $" + total);
+                    custBack();
                 });
             };
         }
