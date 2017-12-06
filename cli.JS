@@ -67,7 +67,7 @@ var mgrBack = function () {
         {
             type: "confirm",
             name: "backConf",
-            message: "\nback to the customer menu?"                
+            message: "\nback to the MGR menu?"                
         }
     ]).then(function(answer){
         if (answer.backConf) {
@@ -246,12 +246,47 @@ var addInv = function() {
         ]).then(function(data){
             var query = connection.query("UPDATE products set qty = qty +" + data.addQTY + " where id =" + data.addID, function(err, res) {
                 if (err) throw err;
-                console.log("items added");
+                console.log("QTY added.");
+                mgrBack();
             });
     
         });
 };
 
-var addNEW = function() {
-    
+var addNew = function() {
+    inquirer.prompt([
+        {
+            type: "text",
+            name: "id",
+            message: "What is the item's ID number?",
+        },
+        {
+            type: "text",
+            name: "prod",
+            message: "What is the product?",
+        },
+        {
+        	type: "text",
+        	name: "dept",
+        	message: "What department is it for?"
+        },
+        {
+            type: "text",
+            name: "qty",
+        	message: "How many are you adding?"
+        },
+        {
+        	type: "text",
+        	name:"price",
+        	message: "How much is it?"
+        }
+
+    ]).then(function(data){
+    	var query = connection.query("INSERT INTO products (id, prodName, deptName, qty, price) VALUES ('" + data.id + "', '" + data.prod + "', '" + data.dept + "', " + data.qty + ", " + data.price + ")", function(err, res) {
+				if (err) throw err;
+                console.log("New item added.");
+                mgrBack();
+		});
+	});
 };
+
