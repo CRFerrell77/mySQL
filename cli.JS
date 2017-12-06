@@ -180,12 +180,12 @@ var orderProd =function() {
 // MGR functions
 
 var mgrFunct = function() {
-    console.log("you are a MGR");
+    console.log("\n-===* MGR Menu *===-");
     inquirer.prompt([
         {
             type: "list",
             name: "mgrMenu",
-            message: "What would you like to do?",
+            message: "\nWhat would you like to do?",
             choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product", "Main Menu", "Exit"]
             
         }
@@ -199,9 +199,9 @@ var mgrFunct = function() {
     		addInv();
     	} else if (ans.mgrMenu === "Add New Product"){
     		addNew();
-    	} else if (answer.mgrMenu === "Main Menu"){ //return to main
+    	} else if (ans.mgrMenu === "Main Menu"){ //return to main
             cli();
-        } else if (answer.mgrMenu === "Exit"){ //exit program
+        } else if (ans.mgrMenu === "Exit"){ //exit program
             process.exit();
         }
     });
@@ -219,12 +219,39 @@ var viewAllMGR =function() {
 };
 
 var viewLow =function() {
-    console.log("\nYou are viewing our current inventory:");
-    var query = connection.query("SELECT * FROM products", function(err, res) {
+    console.log("\nYou are viewing our current ( LOW ) inventory:");
+    var query = connection.query("SELECT * FROM products WHERE qty < 5", function(err, res) {
 		if (err) throw err;
 		for (var i=0; i<res.length; i++) {
 			console.log("\nID #" + res[i].id + " | " + res[i].prodName + " | " + " Price: $" +res[i].price + " | " + "Quantity: " + res[i].qty);
         }
         mgrBack();
 	});
+};
+
+var addInv = function() {
+    inquirer.prompt([
+        {
+            type: "text",
+            name: "addID",
+            message: "Which item ID would you like to add to?",
+            
+        },
+        {
+            type: "text",
+            name: "addQTY",
+            message: "How many items are you adding?",
+            
+        }
+        ]).then(function(data){
+            var query = connection.query("UPDATE products set qty = qty +" + data.addQTY + " where id =" + data.addID, function(err, res) {
+                if (err) throw err;
+                console.log("items added");
+            });
+    
+        });
+};
+
+var addNEW = function() {
+    
 };
